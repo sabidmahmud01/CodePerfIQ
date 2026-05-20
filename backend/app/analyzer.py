@@ -33,6 +33,19 @@ def has_nested_loop(code: str) -> bool:
 
     return False
 
+def generate_summary(complexity: str, bottlenecks: List[str], suggestions: List[str]) -> str:
+    if not bottlenecks:
+        return "No obvious performance bottlenecks were detected using the current rule-based checks."
+
+    main_bottleneck = bottlenecks[0]
+    main_suggestion = suggestions[0] if suggestions else "Review the code structure for possible optimization opportunities."
+
+    return (
+        f"This code has {complexity}. "
+        f"The main issue found is: {main_bottleneck} "
+        f"A possible improvement is: {main_suggestion}"
+    )
+
 def analyze_code(code: str) -> Dict[str, object]:
     lower_code = code.lower()
 
@@ -77,10 +90,13 @@ def analyze_code(code: str) -> Dict[str, object]:
     if "numpy" in lower_code or "pandas" in lower_code:
         suggestions.append("Look for vectorized operations instead of regular Python loops.")
 
+    summary = generate_summary(complexity, bottlenecks, suggestions)
+
     return {
         "language": detect_language(code),
         "complexity": complexity,
         "bottlenecks": bottlenecks,
         "suggestions": suggestions,
+        "summary": summary
     }
     
