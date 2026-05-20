@@ -1,5 +1,8 @@
 from typing import List
 
+from click import prompt
+from app.ai_provider import MockAIProvider
+
 
 def build_ai_prompt(
     code: str,
@@ -42,6 +45,9 @@ def generate_ai_explanation(
     suggestions: List[str],
 ) -> str:
     prompt = build_ai_prompt(code, complexity, bottlenecks, suggestions)
+    provider = MockAIProvider()
+    provider_response = provider.generate_response(prompt)
+    
 
     if not bottlenecks:
         return (
@@ -62,6 +68,7 @@ def generate_ai_explanation(
     explanation += (
         "This explanation is generated from rule-based results for now. "
         "In a future version, this function can call an LLM API to provide deeper reasoning and optimized code suggestions. "
+        f"{provider_response}"
         f"Prompt prepared for future LLM use with {len(prompt)} characters."
     )
 
