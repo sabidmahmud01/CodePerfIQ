@@ -1,4 +1,5 @@
 from typing import Dict, List
+from app.ai_helper import generate_ai_explanation
 
 def detect_language(code: str) -> str:
     if "def " in code or "import " in code:
@@ -91,12 +92,14 @@ def analyze_code(code: str) -> Dict[str, object]:
         suggestions.append("Look for vectorized operations instead of regular Python loops.")
 
     summary = generate_summary(complexity, bottlenecks, suggestions)
+    ai_explanation = generate_ai_explanation(code, complexity, bottlenecks, suggestions)
 
     return {
         "language": detect_language(code),
         "complexity": complexity,
         "bottlenecks": bottlenecks,
         "suggestions": suggestions,
-        "summary": summary
+        "summary": summary,
+        "ai_explanation": ai_explanation,
     }
     
