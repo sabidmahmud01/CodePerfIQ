@@ -10,6 +10,29 @@ def detect_language(code: str) -> str:
     
     return "Unknown"
 
+def has_nested_loop(code: str) -> bool:
+    lines = code.splitlines()
+    loop_indent_stack: List[int] = []
+
+    for line in lines:
+        stripped_line = line.lstrip()
+
+        if not stripped_line:
+            continue
+
+        current_indent = len(line) - len(stripped_line)
+
+        while loop_indent_stack and current_indent <= loop_indent_stack[-1]:
+            loop_indent_stack.pop()
+
+        if stripped_line.startswith("for ") or stripped_line.startswith("while "):
+            if loop_indent_stack:
+                return True
+
+            loop_indent_stack.append(current_indent)
+
+    return False
+
 def analyze_code(code: str) -> Dict[str, object]:
     lower_code = code.lower()
 
@@ -18,18 +41,26 @@ def analyze_code(code: str) -> Dict[str, object]:
 
     loop_count = lower_code.count("for ") + lower_code.count("while ")
 
-    if loop_count >= 2:
+    loop_count = lower_code.count("for ") + lower_code.count("while ")
+    nested_loop_found = has_nested_loop(code)
+
+    if nested_loop_found:
         complexity = "Possible O(n^2) or higher"
-        bottlenecks.append("Multiple loops detected. This may indicate nested or repeated iterations.")
-        suggestions.append("Use a dictionary, set, or better algorithm to reduce repeated scanning.")
+        bottlenecks.append("Nested loop detected.")
+        suggestions.append("Consider using a dictionary, set, or optimized algorithm to reduce repeated scanning.")
+
+    elif loop_count >= 2:
+        complexity = "Possible O(n)"
+        bottlenecks.append("Multiple separate loops detected.")
+        suggestions.append("Separate loops may still be linear if they are not nested, but review repeated passes over the same data.")
 
     elif loop_count == 1:
         complexity = "Possible O(n)"
-        bottlenecks.append("Single loop detected. Check if it can be optimized.")
+        bottlenecks.append("Single loop detected.")
         suggestions.append("Check whether operations inside the loop are expensive.")
 
     else:
-        complexity = "Possible O(1) or non-loop based logic"
+        complexity = "Possible O(1) or non-loop-based logic"
 
     if " in " in lower_code and "list" in lower_code:
         bottlenecks.append("Possible repeated list lookup detected.")   
