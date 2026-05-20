@@ -32,3 +32,19 @@ def print_two_lists(items, users):
     assert result["language"] == "Python"
     assert result["complexity"] == "Possible O(n)"
     assert "Multiple separate loops detected." in result["bottlenecks"]
+
+def test_analysis_includes_summary():
+    code = """
+def two_sum(nums, target):
+    for i in range(len(nums)):
+        for j in range(len(nums)):
+            if nums[i] + nums[j] == target:
+                return [i, j]
+"""
+
+    result = analyze_code(code)
+
+    assert "summary" in result
+    assert isinstance(result["summary"], str)
+    assert len(result["summary"]) > 0
+    assert "Nested loop detected." in result["summary"]
