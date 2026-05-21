@@ -1,5 +1,9 @@
-from abc import ABC, abstractmethod
 import os
+from abc import ABC, abstractmethod
+from dotenv import load_dotenv
+import google.generativeai as genai
+
+load_dotenv()
 
 
 class AIProvider(ABC):
